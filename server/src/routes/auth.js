@@ -15,12 +15,12 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 // Register
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, full_name, role, branch_id } = req.body;
+    const { email, password, username, first_name, last_name, role, branch_id } = req.body;
 
-    if (!email || !password || !full_name) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email, password, and name are required",
+        message: "Email and password are required",
       });
     }
 
@@ -40,10 +40,34 @@ router.post("/register", async (req, res) => {
     // Hash password
     const hashedPassword = await bcryptjs.hash(password, 10);
 
+    // Generate username from email if not provided
+    const userUsername = username || email.split('@')[0];
+    
+    // Parse name - if full_name is provided, split it
+    const userFirstName = first_name || (req.body.full_name ? req.body.full_name.split(' ')[0] : '');
+    const userLastName = last_name || (req.body.full_name ? req.body.full_name.split(' ').slice(1).join(' ') : '');
+
+    // Validate branch_id if provided - it should be a number or null
+    let validBranchId = null;
+    if (branch_id) {
+      if (typeof branch_id === 'number') {
+        validBranchId = branch_id;
+      } else if (typeof branch_id === 'string') {
+        // Try to find branch by name/code
+        const branchResult = await query(
+          "SELECT id FROM branches WHERE name = ? OR code = ?",
+          [branch_id, branch_id]
+        );
+        if (branchResult.rows && branchResult.rows.length > 0) {
+          validBranchId = branchResult.rows[0].id;
+        }
+      }
+    }
+
     // Create user
     const result = await query(
-      "INSERT INTO users (email, password, full_name, role, branch_id, is_active) VALUES (?, ?, ?, ?, ?, true)",
-      [email, hashedPassword, full_name, role || "user", branch_id || null]
+      "INSERT INTO users (username, email, password_hash, first_name, last_name, role, branch_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'active')",
+      [userUsername, email, hashedPassword, userFirstName, userLastName, role || "staff", validBranchId]
     );
 
     // Generate JWT token
