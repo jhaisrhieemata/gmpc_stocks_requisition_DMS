@@ -1,0 +1,31 @@
+{
+  "cSpell.words": [
+    "npm",
+    "nodemon",
+    "Vite",
+    "Shadcn",
+    "env",
+    "gmpc",
+    "requisition",
+    "XAMPP",
+    "TSconfig",
+    "eslint",
+    "vitest",
+    "bun",
+    "supabase",
+    "tanstack",
+    "embla",
+    "radix",
+    "tailwind",
+    "hookform",
+    "jsonwebtoken",
+    "bcryptjs",
+    "validator",
+    "mysql",
+    "dotenv"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
