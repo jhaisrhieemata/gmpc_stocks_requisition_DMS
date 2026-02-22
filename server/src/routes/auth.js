@@ -78,40 +78,58 @@ router.post("/register", async (req, res) => {
 // Login
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, username, password } = req.body;
 
-    if (!email || !password) {
+    if (!password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required",
+        message: "Email/Username and password are required",
       });
     }
 
-    // Find user
-    const result = await query("SELECT * FROM users WHERE email = ?", [email]);
+    if (!email && !username) {
+      return res.status(400).json({
+        success: false,
+        message: "Email or username is required",
+      });
+    }
+
+    // Find user by email or username
+    let queryStr = "";
+    let queryParams = [];
+    
+    if (email) {
+      queryStr = "SELECT * FROM users WHERE email = ?";
+      queryParams = [email];
+    } else {
+      queryStr = "SELECT * FROM users WHERE username = ?";
+      queryParams = [username];
+    }
+
+    const result = await query(queryStr, queryParams);
 
     if (!result.rows || result.rows.length === 0) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email/username or password",
       });
     }
 
     const user = result.rows[0];
 
-    // Check password
-    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    // Check password (use password_hash from database)
+    const isPasswordValid = await bcryptjs.compare(password, user.password_hash);
 
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid email/username or password",
       });
     }
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
+      { userId: user.id, email: user.email, username: user.username, role: user.role },
       JWT_SECRET,
       { expiresIn: "24h" }
     );
