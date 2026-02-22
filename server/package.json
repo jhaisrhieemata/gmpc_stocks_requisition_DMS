@@ -1,0 +1,36 @@
+{
+  "name": "gmpc-requisition-server",
+  "version": "1.0.0",
+  "description": "GMPC Requisition System - Node.js/Express Backend with MySQL",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node --test",
+    "reset-db": "node scripts/reset-db.js",
+    "setup-db": "node scripts/setup-db.js",
+    "migrate": "node scripts/migrate.js"
+  },
+  "keywords": [
+    "requisition",
+    "inventory",
+    "express",
+    "mysql"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "mysql2": "^3.6.5",
+    "dotenv": "^16.3.1",
+    "express-session": "^1.17.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
